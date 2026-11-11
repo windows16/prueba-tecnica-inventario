@@ -28,4 +28,14 @@ export const ProductoService = {
     const { data } = await apiClient.post<Producto>(BASE, request)
     return data
   },
+
+  obtenerPorId: async (id: number): Promise<Producto> => {
+    const { data } = await apiClient.get<Producto>(`${BASE}/${id}`)
+    return data
+  },
+
+  actualizar: async (id: number, request: ProductoRequest): Promise<Producto> => {
+    const { data } = await apiClient.put<Producto>(`${BASE}/${id}`, request)
+    return data
+  },
 }

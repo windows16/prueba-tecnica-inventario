@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { Link } from 'react-router-dom'
-import { Plus, Search } from 'lucide-react'
+import { Plus, Search, Edit } from 'lucide-react'
 import { StockBadge } from '@/components/ui/StockBadge'
 import { LoadingState } from '@/components/ui/LoadingState'
 import { ErrorAlert } from '@/components/ui/ErrorAlert'
@@ -125,7 +125,7 @@ export function ListaProductos() {
             <table className="w-full text-sm">
               <thead className="bg-muted/50">
                 <tr>
-                  {['Nombre', 'Categoría', 'Precio', 'Stock', 'Estado', 'Alta'].map((h) => (
+                  {['Nombre', 'Categoría', 'Precio', 'Stock', 'Estado', 'Alta', 'Acciones'].map((h) => (
                     <th
                       key={h}
                       className="px-4 py-3 text-left font-medium text-muted-foreground"
@@ -138,7 +138,7 @@ export function ListaProductos() {
               <tbody className="divide-y">
                 {paged?.data.length === 0 ? (
                   <tr>
-                    <td colSpan={6} className="px-4 py-10 text-center text-muted-foreground">
+                    <td colSpan={7} className="px-4 py-10 text-center text-muted-foreground">
                       No se encontraron productos con los filtros aplicados.
                     </td>
                   </tr>
@@ -156,6 +156,16 @@ export function ListaProductos() {
                       </td>
                       <td className="px-4 py-3 text-muted-foreground">
                         {new Date(p.fechaCreacion).toLocaleDateString('es-GT')}
+                      </td>
+                      <td className="px-4 py-3">
+                        <Link
+                          to={`/productos/editar/${p.id}`}
+                          className="inline-flex items-center gap-1 rounded-md border border-input px-2.5 py-1 text-xs font-medium text-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
+                          title="Editar producto"
+                        >
+                          <Edit className="h-3.5 w-3.5" />
+                          Editar
+                        </Link>
                       </td>
                     </tr>
                   ))

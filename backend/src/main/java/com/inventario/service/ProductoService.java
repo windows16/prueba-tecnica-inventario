@@ -16,5 +16,9 @@ public interface ProductoService {
      */
     PagedResponse<ProductoResponse> listar(int page, int limit, String nombre, Integer categoriaId);
 
+    ProductoResponse obtenerPorId(Integer id);
+
     ProductoResponse crear(ProductoRequest request);
+
+    ProductoResponse actualizar(Integer id, ProductoRequest request);
 }

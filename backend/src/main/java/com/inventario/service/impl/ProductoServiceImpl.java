@@ -75,12 +75,39 @@ public class ProductoServiceImpl implements ProductoService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public ProductoResponse obtenerPorId(Integer id) {
+        Producto producto = productoRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Producto no encontrado con id: " + id));
+        return ProductoMapper.toResponse(producto);
+    }
+
+    @Override
     public ProductoResponse crear(ProductoRequest request) {
         Categoria categoria = categoriaRepository.findById(request.categoriaId())
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "Categoría no encontrada con id: " + request.categoriaId()));
 
         Producto producto = ProductoMapper.toEntity(request, categoria);
+        return ProductoMapper.toResponse(productoRepository.save(producto));
+    }
+
+    @Override
+    public ProductoResponse actualizar(Integer id, ProductoRequest request) {
+        Producto producto = productoRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Producto no encontrado con id: " + id));
+
+        Categoria categoria = categoriaRepository.findById(request.categoriaId())
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Categoría no encontrada con id: " + request.categoriaId()));
+
+        producto.setNombre(request.nombre().trim());
+        producto.setCategoria(categoria);
+        producto.setPrecio(request.precio());
+        producto.setStock(request.stock());
+
         return ProductoMapper.toResponse(productoRepository.save(producto));
     }
 }

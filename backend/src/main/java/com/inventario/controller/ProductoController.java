@@ -69,4 +69,39 @@ public class ProductoController {
         ProductoResponse creado = productoService.crear(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(creado);
     }
+
+    @Operation(
+            summary = "Obtener un producto por ID",
+            description = "Retorna el detalle de un producto existente."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Producto obtenido exitosamente"),
+            @ApiResponse(responseCode = "404", description = "Producto no encontrado",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    @GetMapping("/{id}")
+    public ResponseEntity<ProductoResponse> obtenerPorId(
+            @Parameter(description = "ID del producto", example = "1")
+            @PathVariable Integer id) {
+        return ResponseEntity.ok(productoService.obtenerPorId(id));
+    }
+
+    @Operation(
+            summary = "Actualizar un producto",
+            description = "Actualiza los datos de un producto existente validando sus restricciones de negocio."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Producto actualizado exitosamente"),
+            @ApiResponse(responseCode = "400", description = "Datos de entrada inválidos",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "Producto o categoría no encontrados",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    @PutMapping("/{id}")
+    public ResponseEntity<ProductoResponse> actualizar(
+            @Parameter(description = "ID del producto a actualizar", example = "1")
+            @PathVariable Integer id,
+            @Valid @RequestBody ProductoRequest request) {
+        return ResponseEntity.ok(productoService.actualizar(id, request));
+    }
 }
