@@ -82,7 +82,6 @@ categorias                                productos
                                           │ fecha_creacion: TIMESTAMPTZ DEFAULT NOW()              │
                                           └────────────────────────────────────────────────────────┘
 ```
----
 
 ## Estructura del Proyecto
 
