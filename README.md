@@ -27,21 +27,14 @@ para el control de stock e integridad de categorías.
 
 ## Levantar el Proyecto con Docker
 
-### 1. Clonar o ingresar al directorio del proyecto
+### 1. Clonar e ingresar al proyecto
 
 ```bash
+git clone https://github.com/windows16/prueba-tecnica-inventario.git
 cd prueba-tecnica-inventario
 ```
 
-### 2. Variables de entorno (Opcional)
-
-El archivo `docker-compose.yml` cuenta con valores por defecto preconfigurados y listos para usar. Si se desean personalizar credenciales, se puede copiar la plantilla:
-
-```bash
-cp .env.example .env
-```
-
-### 3. Construir y levantar los contenedores
+### 2. Construir y levantar los contenedores
 
 ```bash
 docker compose up --build
@@ -49,7 +42,7 @@ docker compose up --build
 
 *(Si se requiere reconstruir descartando capas anteriores, usar `docker compose build --no-cache && docker compose up`).*
 
-### 4. Puntos de acceso
+### 3. Puntos de acceso
 
 | Servicio | URL | Descripción |
 |---|---|---|
@@ -60,7 +53,7 @@ docker compose up --build
 
 > En el primer arranque, PostgreSQL ejecuta automáticamente el script `database.sql` cargando las tablas normalizadas y los datos de prueba iniciales (incluyendo casos de bajo stock).
 
-### 5. Detener la aplicación
+### 4. Detener la aplicación
 
 ```bash
 # Detener contenedores preservando los datos de la base de datos
