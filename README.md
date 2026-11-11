@@ -81,16 +81,6 @@ categorias                                productos
                                           │ stock: INT CHECK (stock >= 0)                          │
                                           │ fecha_creacion: TIMESTAMPTZ DEFAULT NOW()              │
                                           └────────────────────────────────────────────────────────┘
-```
-
-### Importación Manual (Entorno sin Docker)
-
-Si se desea ejecutar la base de datos fuera de Docker en un servidor PostgreSQL local:
-
-```bash
-psql -U postgres -c "CREATE DATABASE inventario_db;"
-psql -U postgres -d inventario_db -f database.sql
-```
 
 ---
 
