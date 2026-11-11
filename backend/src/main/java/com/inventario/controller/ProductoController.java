@@ -1,9 +1,17 @@
 package com.inventario.controller;
 
 import com.inventario.dto.request.ProductoRequest;
+import com.inventario.dto.response.ErrorResponse;
 import com.inventario.dto.response.PagedResponse;
 import com.inventario.dto.response.ProductoResponse;
 import com.inventario.service.ProductoService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -11,35 +19,51 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 /**
- * Controller REST para el recurso Producto.
+ * Controller REST para el recurso Producto documentado con OpenAPI 3 / Swagger.
  */
 @RestController
 @RequestMapping("/api/productos")
 @RequiredArgsConstructor
+@Tag(name = "Productos", description = "Operaciones para la gestión de productos e inventario")
 public class ProductoController {
 
     private final ProductoService productoService;
 
-    /**
-     * GET /api/productos — lista paginada con filtros opcionales.
-     *
-     * @param page        número de página, 1-based (default: 1)
-     * @param limit       elementos por página (default: 10)
-     * @param nombre      búsqueda parcial por nombre (opcional)
-     * @param categoriaId filtro exacto por categoría (opcional)
-     */
+    @Operation(
+            summary = "Listar productos con paginación y filtros",
+            description = "Obtiene los productos paginados y permite filtrar por coincidencia en el nombre o categoría específica."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Listado de productos obtenido exitosamente")
+    })
     @GetMapping
     public ResponseEntity<PagedResponse<ProductoResponse>> listar(
-            @RequestParam(defaultValue = "1")  int page,
-            @RequestParam(defaultValue = "10") int limit,
-            @RequestParam(required = false)    String nombre,
-            @RequestParam(required = false)    Integer categoriaId) {
+            @Parameter(description = "Número de página (1-based)", example = "1")
+            @RequestParam(defaultValue = "1") int page,
 
-        return ResponseEntity.ok(
-                productoService.listar(page, limit, nombre, categoriaId));
+            @Parameter(description = "Cantidad de elementos por página", example = "10")
+            @RequestParam(defaultValue = "10") int limit,
+
+            @Parameter(description = "Filtro por coincidencia parcial de nombre", example = "Galaxy")
+            @RequestParam(required = false) String nombre,
+
+            @Parameter(description = "ID de la categoría a filtrar", example = "1")
+            @RequestParam(required = false) Integer categoriaId) {
+
+        return ResponseEntity.ok(productoService.listar(page, limit, nombre, categoriaId));
     }
 
-    /** POST /api/productos — registra un nuevo producto. */
+    @Operation(
+            summary = "Registrar un nuevo producto",
+            description = "Crea un producto validando que el nombre no esté vacío, el precio sea > 0 y el stock >= 0."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "Producto registrado exitosamente"),
+            @ApiResponse(responseCode = "400", description = "Datos de entrada inválidos (falla de validación)",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "Categoría asignada no encontrada",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    })
     @PostMapping
     public ResponseEntity<ProductoResponse> crear(@Valid @RequestBody ProductoRequest request) {
         ProductoResponse creado = productoService.crear(request);

@@ -24,3 +24,9 @@ logging:
   level:
     com.inventario: INFO
     org.springframework.web: INFO
+
+springdoc:
+  api-docs:
+    path: /api/v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html

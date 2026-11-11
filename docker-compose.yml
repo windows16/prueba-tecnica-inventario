@@ -1,0 +1,77 @@
+# ============================================================
+#  Docker Compose — Sistema de Inventario
+#  Levanta los 3 servicios: db, backend, frontend
+#
+#  Uso:
+#    cp .env.example .env      # ajustar contraseñas si se desea
+#    docker compose up --build
+#    Abrir: http://localhost
+# ============================================================
+
+services:
+
+  # ── PostgreSQL 16 ─────────────────────────────────────────
+  db:
+    image: postgres:16-alpine
+    container_name: inventario_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB:       ${POSTGRES_DB:-inventario_db}
+      POSTGRES_USER:     ${POSTGRES_USER:-inventario_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-inventario_pass}
+    volumes:
+      # Volumen persistente: los datos sobreviven reinicios del contenedor
+      - postgres_data:/var/lib/postgresql/data
+      # El script SQL se ejecuta automáticamente en el primer arranque
+      - ./database.sql:/docker-entrypoint-initdb.d/01-database.sql:ro
+    ports:
+      # Expuesto solo para debugging local; no es necesario en producción
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-inventario_user} -d ${POSTGRES_DB:-inventario_db}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+  # ── Spring Boot API ───────────────────────────────────────
+  api_inventario:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: api_inventario
+    restart: unless-stopped
+    environment:
+      SPRING_DATASOURCE_URL:      jdbc:postgresql://db:5432/${POSTGRES_DB:-inventario_db}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-inventario_user}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-inventario_pass}
+    ports:
+      # Expuesto para debugging directo con Postman/curl
+      - "8080:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8080/api/categorias || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
+
+  # ── React + nginx ─────────────────────────────────────────
+  web_inventario:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: web_inventario
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    depends_on:
+      api_inventario:
+        condition: service_healthy
+
+# ── Volúmenes ─────────────────────────────────────────────
+volumes:
+  postgres_data:
+    name: inventario_postgres_data
