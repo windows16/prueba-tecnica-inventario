@@ -81,7 +81,7 @@ categorias                                productos
                                           │ stock: INT CHECK (stock >= 0)                          │
                                           │ fecha_creacion: TIMESTAMPTZ DEFAULT NOW()              │
                                           └────────────────────────────────────────────────────────┘
-
+```
 ---
 
 ## Estructura del Proyecto
