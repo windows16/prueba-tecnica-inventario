@@ -1,0 +1,26 @@
+server:
+  port: 8080
+
+spring:
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/inventario_db}
+    username: ${SPRING_DATASOURCE_USERNAME:postgres}
+    password: ${SPRING_DATASOURCE_PASSWORD:postgres}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      # 'validate': Hibernate valida el schema contra las entidades pero NO lo modifica.
+      # El schema lo gestiona database.sql (importado por Docker o manualmente).
+      ddl-auto: validate
+    show-sql: false
+    open-in-view: false          # Evita LazyInitializationException silenciosas
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+        default_schema: public
+
+logging:
+  level:
+    com.inventario: INFO
+    org.springframework.web: INFO
