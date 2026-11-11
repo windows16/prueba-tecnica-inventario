@@ -21,9 +21,6 @@ public class OpenApiConfig {
                         .title("API REST - Sistema de Gestión de Inventario")
                         .version("1.0.0")
                         .description("API para el control de inventario, stock y categorización de productos.")
-                        .contact(new Contact()
-                                .name("Soporte Técnico")
-                                .email("soporte@inventario.com"))
                         .license(new License()
                                 .name("Apache 2.0")
                                 .url("https://www.apache.org/licenses/LICENSE-2.0.html")));

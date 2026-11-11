@@ -6,45 +6,6 @@ para el control de stock e integridad de categorías.
 
 ---
 
-## 📋 Requisitos Funcionales y Reglas de Negocio
-
-El sistema cubre formalmente los siguientes requisitos funcionales de acuerdo a la especificación técnica:
-
-### RF-01: Listado y Visualización de Productos
-- **Descripción:** El sistema debe presentar una vista principal que liste todos los productos en una tabla organizada y responsiva.
-- **Campos visibles:** Nombre del producto, Categoría asignada, Precio unitario, Unidades en Stock, Estado de Inventario y Fecha de creación.
-- **Paginación:** La información se presenta paginada en bloques de 10 elementos para optimizar el rendimiento.
-
-### RF-02: Búsqueda y Filtrado de Productos
-- **Descripción:** El usuario debe poder localizar productos mediante filtros combinables:
-  - **Búsqueda por texto:** Filtrado por coincidencia parcial de texto en el nombre del producto (case-insensitive).
-  - **Filtro por categoría:** Selector desplegable que permite aislar los productos de una categoría específica o ver todas.
-
-### RF-03: Registro de Nuevos Productos
-- **Descripción:** El sistema debe proveer un formulario para dar de alta productos asignándolos a una categoría existente.
-- **Validaciones obligatorias (Frontend & Backend):**
-  - **Nombre:** Obligatorio, no vacío ni espacios en blanco (máximo 200 caracteres).
-  - **Categoría:** Obligatoria, debe existir previamente en la base de datos.
-  - **Precio:** Numérico decimal obligatorio y estrictamente mayor a 0 (`precio > 0`).
-  - **Stock:** Entero obligatorio, no negativo (`stock >= 0`).
-
-### RF-04: Control y Alerta Visual de Stock (Regla de Negocio)
-- **Descripción:** La interfaz debe evaluar en tiempo real la cantidad de stock de cada producto y mostrar un indicador visual distintivo según la condición:
-  - **Sin Stock (Stock = 0):** Etiqueta roja indicando `"Sin stock"`.
-  - **Bajo Stock (1 ≤ Stock ≤ 5):** Etiqueta de advertencia amarilla/ámbar indicando `"Bajo stock"`.
-  - **Stock Normal (Stock > 5):** Etiqueta verde indicando `"Disponible"`.
-
-### RF-05: Gestión de Categorías
-- **Descripción:** El sistema debe permitir visualizar las categorías disponibles junto con la cantidad de productos vinculados a cada una, así como registrar nuevas categorías con nombres únicos.
-
-### RF-06: Integridad Referencial en Categorías (Regla de Negocio)
-- **Descripción:** El sistema debe impedir la eliminación de cualquier categoría que tenga productos asociados.
-- **Comportamiento:**
-  - En la interfaz, la acción de eliminar se deshabilita preventivamente si la categoría posee productos asociados.
-  - A nivel backend y base de datos, si se intenta eliminar una categoría con dependencias, se rechaza la solicitud controladamente (`HTTP 409 Conflict` / `ON DELETE RESTRICT`) sin provocar caídas ni excepciones no controladas en el servidor.
-
----
-
 ## Stack Tecnológico
 
 | Capa | Tecnología | Justificación |
@@ -195,3 +156,88 @@ prueba-tecnica-inventario/
 ├── .env.example                         # Plantilla de variables de entorno
 └── README.md                            # Documentación integral del proyecto
 ```
+
+### ¿Por qué elegí esta estructura? (Decisiones de diseño)
+
+Para este proyecto busqué orden, buenas prácticas y simplicidad, evitando complicaciones:
+
+* **Backend por capas (Spring Boot):** Separé el código en controladores, servicios y repositorios para que cada clase tenga una única responsabilidad. Use DTOs para no exponer las tablas de la base de datos directamente al frontend y un manejador global de excepciones para que los errores devuelvan mensajes claros.
+* **Frontend por caracteristicas(React):** En lugar de tener todos los archivos revueltos, agrupé todo lo relacionado a productos y categorias en sus propias carpetas (pages, services y models). Esto hace que el proyecto sea fácil de leer y mantener.
+* **Base de datos (PostgreSQL):** La relación entre productos y categorías está en 3ra Forma Normal (sin datos repetidos). Además de validar en Java, configuré restricciones en la bd para asegurarlas.
+* **Docker y Nginx:** Usé Docker Compose para que cualquier persona pueda probar el proyecto con un solo comando. Nginx se encarga de servir la web y hacer de puente hacia el backend, evitando problemas con cors o configs de puertos.
+
+## Requisitos Funcionales y Reglas de Negocio
+
+### RF-01. Listado de Productos (Vista principal)
+
+Mostrar una tabla o tarjetas con: Nombre, Categoría, Precio, Stock y Estado.
+
+**Filtro simple:** Un buscador por nombre o un filtro desplegable por categoría.
+
+### RF-02. Crear Producto
+
+Formulario para registrar un producto asignándole una categoría existente.
+
+**Validaciones obligatorias:**
+
+- El nombre no puede estar vacío.
+- El precio debe ser mayor a 0.
+- El stock no puede ser negativo.
+
+### Regla de Negocio (Lógica a evaluar)
+
+Si el stock de un producto es menor o igual a 5, la interfaz debe mostrar una
+alerta visual en CSS (ejemplo: texto o etiqueta en color rojo/amarillo indicando
+**"Bajo Stock"**).
+
+No debe permitirse eliminar una categoría si todavía tiene productos asociados
+(o manejar el error adecuadamente sin que la app colapse).
+
+---
+
+## Casos de Uso, Escenarios de Prueba y Evidencia
+
+### CU-01: Visualización y Filtrado de Inventario (RF-01)
+* **Escenario 1.1 (Listado general):** Al ingresar al sistema, se muestra la tabla con Nombre, Categoría, Precio, Stock y Estado de cada producto.
+* **Escenario 1.2 (Filtro por búsqueda/categoría):** Al escribir un término (ej. "JBL") o seleccionar una categoría, la tabla filtra inmediatamente los resultados coincidentes.
+
+![Listado de productos general](evidencia/01-productos.png)
+*Figura 1: Vista principal con inventario completo y estados visuales.*
+
+![Listado filtrado por búsqueda](evidencia/01-productos-filtrado.png)
+*Figura 2: Búsqueda dinámica filtrando productos coincidentes.*
+
+---
+
+### CU-02: Alerta Visual de Bajo Stock — Regla de Negocio (RF-04)
+* **Escenario 2.1 (Alerta de Stock Crítico):** Si el stock es menor o igual a 5 unidades (o 0), la columna "Estado" resalta con una etiqueta visual de advertencia (`Bajo Stock`) en color rojo/amarillo.
+* **Escenario 2.2 (Stock Normal):** Productos con stock mayor a 5 muestran el indicador verde (`Disponible`).
+
+*(Referencia visual observable en la Figura 1: productos con stock ≤ 5 marcados con alerta).*
+
+---
+
+### CU-03: Registro y Validación de Producto (RF-02)
+* **Escenario 3.1 (Validaciones obligatorias):** Si se intenta guardar con campos vacíos, precio menor/igual a 0 o stock negativo, el sistema bloquea el envío y muestra los errores correspondientes sin recargar la página.
+* **Escenario 3.2 (Registro exitoso):** Con los datos válidos y categoría seleccionada, el producto se guarda correctamente y se refleja en el inventario.
+
+![Validaciones del formulario](evidencia/03-validaciones-producto.png)
+*Figura 3: Validación de campos obligatorios en el cliente y servidor.*
+
+![Formulario de nuevo producto completado](evidencia/05-nuevo-producto.png)
+*Figura 4: Ingreso de datos cumpliendo las reglas de negocio.*
+
+![Confirmación de creación](evidencia/05-nuevo-producto2.png)
+*Figura 5: Producto registrado y visualizado en el listado.*
+
+---
+
+### CU-04: Gestión de Categorías y Restricción de Integridad (RF-05 / RF-06)
+* **Escenario 4.1 (Creación de categoría):** Permite registrar una categoría con nombre único para clasificar nuevos productos.
+* **Escenario 4.2 (Restricción de eliminación):** No se permite eliminar categorías que tengan productos asociados; el sistema maneja la restricción controladamente mostrando mensaje informativo sin colapsar.
+
+![Listado de categorías](evidencia/02-categorias.png)
+*Figura 6: Listado de categorías con contador de productos asociados y bloqueo de borrado.*
+
+![Formulario de nueva categoría](evidencia/04-nueva-categoria.png)
+*Figura 7: Formulario de alta para una nueva categoría.*
