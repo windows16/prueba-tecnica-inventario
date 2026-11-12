@@ -90,7 +90,13 @@ public class ProductoServiceImpl implements ProductoService {
                         "Categoría no encontrada con id: " + request.categoriaId()));
 
         Producto producto = ProductoMapper.toEntity(request, categoria);
+
+        if (producto.getStock() > 9999) {
+            throw new BusinessRuleException(
+                    "El stock del producto no puede superar 9999 unidades.");
+        }
         return ProductoMapper.toResponse(productoRepository.save(producto));
+
     }
 
     @Override
