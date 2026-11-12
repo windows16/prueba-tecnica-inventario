@@ -83,38 +83,6 @@ categorias                                productos
                                           └────────────────────────────────────────────────────────┘
 ```
 
-### Importación Manual (Entorno sin Docker)
-
-Si se desea ejecutar la base de datos fuera de Docker en un servidor PostgreSQL local:
-
-```bash
-psql -U postgres -c "CREATE DATABASE inventario_db;"
-psql -U postgres -d inventario_db -f database.sql
-```
-
----
-
-## API REST Endpoints
-
-### Categorías
-- `GET /api/categorias`: Obtiene el listado completo de categorías y el total de productos de cada una.
-- `POST /api/categorias`: Registra una nueva categoría (`{ "nombre": "..." }`).
-- `DELETE /api/categorias/{id}`: Elimina una categoría si no tiene productos asociados (retorna `409 Conflict` si posee dependencias).
-
-### Productos
-- `GET /api/productos?page=1&limit=10&nombre=&categoriaId=`: Listado paginado de productos con filtros dinámicos.
-- `POST /api/productos`: Registra un nuevo producto:
-  ```json
-  {
-    "nombre": "Mouse Ergonómico",
-    "categoriaId": 1,
-    "precio": 35.50,
-    "stock": 4
-  }
-  ```
-
----
-
 ## Estructura del Proyecto
 
 ```
