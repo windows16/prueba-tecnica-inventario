@@ -148,7 +148,7 @@ export function ListaProductos() {
                       <td className="px-4 py-3 font-medium">{p.nombre}</td>
                       <td className="px-4 py-3 text-muted-foreground">{p.categoriaNombre}</td>
                       <td className="px-4 py-3">
-                        ${Number(p.precio).toFixed(2)}
+                        Q{Number(p.precio).toFixed(2)}
                       </td>
                       <td className="px-4 py-3">{p.stock}</td>
                       <td className="px-4 py-3">
