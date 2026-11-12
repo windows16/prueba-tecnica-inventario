@@ -41,6 +41,16 @@ public class GlobalExceptionHandler {
                 .body(buildError(HttpStatus.CONFLICT, ex.getMessage(), request));
     }
 
+    // ── 400 Bad Request (IllegalArgumentException o validaciones lógicas) ─
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ErrorResponse> handleIllegalArgument(
+            IllegalArgumentException ex, HttpServletRequest request) {
+
+        return ResponseEntity.badRequest()
+                .body(buildError(HttpStatus.BAD_REQUEST, ex.getMessage(), request));
+    }
+
     // ── 400 Bad Request (validación de Bean Validation) ───────────────────
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

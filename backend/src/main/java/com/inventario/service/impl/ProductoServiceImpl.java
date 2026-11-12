@@ -89,14 +89,15 @@ public class ProductoServiceImpl implements ProductoService {
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "Categoría no encontrada con id: " + request.categoriaId()));
 
-        Producto producto = ProductoMapper.toEntity(request, categoria);
-
-        if (producto.getStock() > 9999) {
-            throw new BusinessRuleException(
-                    "El stock del producto no puede superar 9999 unidades.");
+        if (request.precio() != null && request.precio().compareTo(new java.math.BigDecimal("1000000")) > 0) {
+            throw new com.inventario.exception.BusinessRuleException("El precio no puede ser mayor a 1,000,000");
         }
-        return ProductoMapper.toResponse(productoRepository.save(producto));
+        if (request.stock() != null && request.stock() > 1000000) {
+            throw new com.inventario.exception.BusinessRuleException("El stock no puede ser mayor a 1,000,000");
+        }
 
+        Producto producto = ProductoMapper.toEntity(request, categoria);
+        return ProductoMapper.toResponse(productoRepository.save(producto));
     }
 
     @Override
@@ -108,6 +109,13 @@ public class ProductoServiceImpl implements ProductoService {
         Categoria categoria = categoriaRepository.findById(request.categoriaId())
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "Categoría no encontrada con id: " + request.categoriaId()));
+
+        if (request.precio() != null && request.precio().compareTo(new java.math.BigDecimal("1000000")) > 0) {
+            throw new com.inventario.exception.BusinessRuleException("El precio no puede ser mayor a 1,000,000");
+        }
+        if (request.stock() != null && request.stock() > 1000000) {
+            throw new com.inventario.exception.BusinessRuleException("El stock no puede ser mayor a 1,000,000");
+        }
 
         producto.setNombre(request.nombre().trim());
         producto.setCategoria(categoria);
